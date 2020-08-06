@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template
-import requests 
+import requests
+import os
 
 from item import Item
 
@@ -11,7 +12,7 @@ def index():
     return render_template('index.html', items=items)
 
 def getItems():
-    backendURI = "http://localhost:8082"
+    backendURI = getBackendURI()
     r = requests.get(backendURI)
     items = []
     for i in r.json():
@@ -19,3 +20,9 @@ def getItems():
     
     print(items)
     return items
+
+def getBackendURI():
+    backendURI = "http://localhost:8082"
+    if os.environ.get('BACKEND_URI') != None:
+        backendURI = os.environ.get('BACKEND_URI')
+    return backendURI
