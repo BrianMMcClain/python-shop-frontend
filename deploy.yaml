@@ -1,0 +1,78 @@
+# Backend Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-shop-backend
+  labels:
+    app: python-shop-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-shop-backend
+  template:
+    metadata:
+      labels:
+        app: python-shop-backend
+    spec:
+      containers:
+      - name: python-shop-backend
+        image: brianmmcclain/python-shop-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-shop-backend-service
+spec:
+  selector:
+    app: python-shop-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+# Frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-shop-frontend
+  labels:
+    app: python-shop-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-shop-frontend
+  template:
+    metadata:
+      labels:
+        app: python-shop-frontend
+    spec:
+      containers:
+      - name: python-shop-frontend
+        image: brianmmcclain/python-shop-frontend:latest
+        env:
+        - name: BACKEND_URI
+          value: http://python-shop-backend-service:8080
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-shop-frontend-service
+spec:
+  selector:
+    app: python-shop-frontend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
