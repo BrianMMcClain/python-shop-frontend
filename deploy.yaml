@@ -38,6 +38,15 @@ spec:
 
 # Frontend
 ---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: python-shop-frontend-config
+data:
+  config.cfg: |
+    BACKEND_URI="http://python-shop-backend-service:8080"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,12 +66,16 @@ spec:
       containers:
       - name: python-shop-frontend
         image: brianmmcclain/python-shop-frontend:latest
-        env:
-        - name: BACKEND_URI
-          value: http://python-shop-backend-service:8080
+        volumeMounts:
+        - name: python-shop-frontend-config-volume
+          mountPath: /config
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+      volumes:
+      - name: python-shop-frontend-config-volume
+        configMap:
+          name: python-shop-frontend-config
 
 ---
 apiVersion: v1

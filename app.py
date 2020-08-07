@@ -5,6 +5,7 @@ import os
 from item import Item
 
 app = Flask(__name__)
+CONFIG_PATH = "/config/config.cfg"
 
 @app.route('/')
 def index():
@@ -18,11 +19,10 @@ def getItems():
     for i in r.json():
         items.append(Item(i["id"], i["name"], i["price"], i["count"]))
     
-    print(items)
     return items
 
 def getBackendURI():
-    backendURI = "http://localhost:8082"
-    if os.environ.get('BACKEND_URI') != None:
-        backendURI = os.environ.get('BACKEND_URI')
-    return backendURI
+    if os.path.exists(CONFIG_PATH):
+        app.config.from_pyfile(CONFIG_PATH)
+        return app.config["BACKEND_URI"]
+    return "http://localhost:8082"
